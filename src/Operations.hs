@@ -16,12 +16,21 @@ grabKid board robot =
         
 
 dropKid :: Board -> Robot -> Board 
-dropKid board robot = 
-    let
+dropKid board robot 
+    | existEmptyCrib =
+        let
+            newCrib = Crib (x robot) (y robot) True 
+            boardWithoutCrib = Board.remove newBoard possibleCrib
+            boardReady = Board.add boardWithoutCrib newCrib
+        in
+            Board.add boardReady newRobot
+    | otherwise =
+        Board.add newBoard newRobot
+    where
         newRobot = Robot (x robot) (y robot) False
         newBoard = Board.remove board robot
-    in 
-        Board.add newBoard newRobot
+        possibleCrib = Crib (x robot) (y robot) False
+        existEmptyCrib = ListUtils.exist possibleCrib (cribs newBoard)
 
 clean :: Board -> Robot -> Board
 clean board robot = Board.remove board dirt 
