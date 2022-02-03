@@ -68,6 +68,20 @@ generateObstcles board cant =
     in
         generateObstcles newBoard (cant-1)
 
+generateDirts :: Board -> Int -> Board
+generateDirts board 0 = board
+generateDirts board cant =
+    let
+        freeSlots = getAllEmptySlots board
+        freeSlotsAmount = length freeSlots
+        i = generateRandom freeSlotsAmount (seed board)
+        newSeedBoard = changeSeed board
+        selectedSlot = ListUtils.index freeSlots i
+        dirt = uncurry Dirt selectedSlot
+        newBoard = Board.add newSeedBoard dirt
+    in
+        generateObstcles newBoard (cant-1)
+
 
 getAvaibleSlots :: Board -> [(Int,Int)] -> [(Int,Int)]
 getAvaibleSlots board [] = getAllEmptySlots board
