@@ -116,7 +116,7 @@ instance Displayable Crib where
 data Ghost = Ghost{
     xGhost :: Int,
     yGhost :: Int
-}
+} deriving (Show, Eq)
 
 instance Displayable Ghost where
     x a = xGhost a

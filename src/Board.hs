@@ -17,12 +17,18 @@ data Board = Board {
 } deriving (Show)
 
 data Objective = Objective {
-    robot :: Robot,
+    robotObj :: Robot,
     destinyX :: Int,
     destinyY :: Int,
     action :: String,
     cost :: Int
 } deriving (Show, Eq)
+
+cleanObj = "Clean"
+dropObj = "Drop"
+moveObj = "Move"
+noObj = "No"
+falseObj = "False"
 
 initializeBoard :: Int -> Int -> Int -> Board
 initializeBoard n m = Board n m [] [] [] [] [] []

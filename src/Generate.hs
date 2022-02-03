@@ -81,7 +81,7 @@ generateDirts board cant =
         dirt = uncurry Dirt selectedSlot
         newBoard = Board.add newSeedBoard dirt
     in
-        generateObstcles newBoard (cant-1)
+        generateDirts newBoard (cant-1)
 
 
 getAvaibleSlots :: Board -> [(Int,Int)] -> [(Int,Int)]
