@@ -21,6 +21,7 @@ data Objective = Objective {
     destinyX :: Int,
     destinyY :: Int,
     action :: String,
+    nextSlot :: Ghost,
     cost :: Int
 } deriving (Show, Eq)
 

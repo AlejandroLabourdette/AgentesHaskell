@@ -22,7 +22,7 @@ main = do
     -- putStrLn (printBoard board10)
     -- putStrLn (printBoard board11)
     -- putStrLn (printBoard board12)
-    print (computeObjectives board06)
+    print (computeObjectives board05)
 
 -- board01 = initializeBoard 6 6 876318
 board01 = initializeBoard 6 6 876314

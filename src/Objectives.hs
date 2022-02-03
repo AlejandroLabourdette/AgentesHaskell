@@ -85,7 +85,8 @@ addObjectiveToBoard board robot slot objtype currentCost
     | otherwise = board
     where
         oldObj = findObjectiveWithPosGhost (objectives board) slot
-        newObj = Objective robot (x slot) (y slot) objtype currentCost
+        firstStep = computeFirstStep board slot robot
+        newObj = Objective robot (x slot) (y slot) objtype firstStep currentCost
         oldLength = lengthBoard board
         oldWidth =  widthBoard board
         oldKids = kids board
@@ -96,15 +97,15 @@ addObjectiveToBoard board robot slot objtype currentCost
         oldSeed = seed board
 
 findObjectiveWithPosGhost :: [Objective] -> Ghost -> Objective 
-findObjectiveWithPosGhost [] _ = Objective (Robot 0 0 False) 0 0 falseObj infinite
+findObjectiveWithPosGhost [] _ = Objective (Robot 0 0 False) 0 0 falseObj (Ghost 0 0) infinite
 findObjectiveWithPosGhost (obj:rest) pos
     | (destinyX obj == x pos) && (destinyY obj == y pos) = obj
     | otherwise = findObjectiveWithPosGhost rest pos 
 
 boardBFS :: Board -> Robot -> Ghost -> [Ghost] -> [(Ghost,Int)] -> Int -> ([Ghost],[(Ghost,Int)])
 boardBFS board robot slot visited queue cost
-    | loaded robot = registerSlots board toRegisterLong visited queue cost
-    | otherwise = registerSlots board toregisterShort visited queue cost
+    | loaded robot = registerSlots board robot toRegisterLong visited queue cost
+    | otherwise = registerSlots board robot toregisterShort visited queue cost
     where
         upSlot = calcPos board slot (-1) 0
         up2Slot = calcPos board slot (-2) 0
@@ -117,21 +118,90 @@ boardBFS board robot slot visited queue cost
         toregisterShort = [upSlot,dwnSlot,lftSlot,rghtSlot]
         toRegisterLong = [upSlot,up2Slot,dwnSlot,dwn2Slot,lftSlot,lft2Slot,rghtSlot,rght2Slot]
 
-registerSlots :: Board -> [Ghost] -> [Ghost] -> [(Ghost,Int)] -> Int -> ([Ghost],[(Ghost,Int)])
-registerSlots board [] visited queue cost = (visited,queue)
-registerSlots board (toReg:rest) visited queue cost
+registerSlots :: Board -> Robot -> [Ghost] -> [Ghost] -> [(Ghost,Int)] -> Int -> ([Ghost],[(Ghost,Int)])
+registerSlots board robot [] visited queue cost = (visited,queue)
+registerSlots board robot (toReg:rest) visited queue cost
     | not (ListUtils.exist toReg visited) && slotTypeIsCorrect =
         let
             newVisited = ListUtils.add toReg visited
             newQueue = ListUtils.add (toReg,cost+1) queue
         in
-            registerSlots board rest newVisited newQueue cost
+            registerSlots board robot rest newVisited newQueue cost
     | otherwise = 
-        registerSlots board rest visited queue cost
+        registerSlots board robot rest visited queue cost
     where
         slotType = get board (x toReg) (y toReg)
+        possibleRobot = Robot (x toReg) (y toReg) True
+        possibleCrib = Crib (x toReg) (y toReg) True
+        noRobot = not(ListUtils.exist possibleRobot (robots board))
+        noCrib = not(ListUtils.exist possibleCrib (cribs board))
         slotTypeIsCorrect =
-            slotType == kidType || -- are kids fine here?
+            (slotType == kidType && not(loaded robot) && noRobot && noCrib) || -- are kids fine here?
             slotType == dirtType || 
             slotType == cribType || 
+            slotType == emptyType
+
+computeFirstStep :: Board -> Ghost -> Robot -> Ghost 
+computeFirstStep board endPos robot = _computeFirstStep board robot [endPos] [(endPos,0)]
+
+_computeFirstStep :: Board -> Robot -> [Ghost] -> [(Ghost,Int)] -> Ghost
+_computeFirstStep board robot visited [] = error "Robot slot not found in inverse BFS"
+_computeFirstStep board robot visited (queueElement:queueRest)
+    | closeToObjective board robot slot = slot
+    | otherwise =
+        let
+            (newVisited,newQueue) = boardInverseBFS board robot slot visited queueRest cost
+        in 
+            _computeFirstStep board robot newVisited newQueue
+    where
+        slot = fst queueElement
+        cost = snd queueElement
+    
+closeToObjective :: Board -> Robot -> Ghost -> Bool 
+closeToObjective board robot slot
+    | loaded robot = ListUtils.exist robotSlot longList
+    | otherwise = ListUtils.exist robotSlot shortList
+    where
+        robotSlot = Ghost (x robot) (y robot)
+        upSlot = calcPos board slot (-1) 0
+        up2Slot = calcPos board slot (-2) 0
+        dwnSlot = calcPos board slot 1 0
+        dwn2Slot = calcPos board slot 2 0
+        lftSlot = calcPos board slot 0 (-1)
+        lft2Slot = calcPos board slot 0 (-2)
+        rghtSlot = calcPos board slot 0 1
+        rght2Slot = calcPos board slot 0 2
+        shortList = [upSlot,dwnSlot,lftSlot,rghtSlot]
+        longList = [upSlot,up2Slot,dwnSlot,dwn2Slot,lftSlot,lft2Slot,rghtSlot,rght2Slot]
+
+boardInverseBFS :: Board -> Robot -> Ghost -> [Ghost] -> [(Ghost,Int)] -> Int -> ([Ghost],[(Ghost,Int)])
+boardInverseBFS board robot slot visited queue cost
+    | loaded robot = registerSlotsInverse board toRegisterLong visited queue cost
+    | otherwise = registerSlotsInverse board toregisterShort visited queue cost
+    where
+        upSlot = calcPos board slot (-1) 0
+        up2Slot = calcPos board slot (-2) 0
+        dwnSlot = calcPos board slot 1 0
+        dwn2Slot = calcPos board slot 2 0
+        lftSlot = calcPos board slot 0 (-1)
+        lft2Slot = calcPos board slot 0 (-2)
+        rghtSlot = calcPos board slot 0 1
+        rght2Slot = calcPos board slot 0 2
+        toregisterShort = [upSlot,dwnSlot,lftSlot,rghtSlot]
+        toRegisterLong = [upSlot,up2Slot,dwnSlot,dwn2Slot,lftSlot,lft2Slot,rghtSlot,rght2Slot]
+
+registerSlotsInverse :: Board -> [Ghost] -> [Ghost] -> [(Ghost,Int)] -> Int -> ([Ghost],[(Ghost,Int)])
+registerSlotsInverse board [] visited queue cost = (visited,queue)
+registerSlotsInverse board (toReg:rest) visited queue cost
+    | not (ListUtils.exist toReg visited) && slotTypeIsCorrect =
+        let
+            newVisited = ListUtils.add toReg visited
+            newQueue = ListUtils.add (toReg,cost+1) queue
+        in
+            registerSlotsInverse board rest newVisited newQueue cost
+    | otherwise = 
+        registerSlotsInverse board rest visited queue cost
+    where
+        slotType = get board (x toReg) (y toReg)
+        slotTypeIsCorrect = 
             slotType == emptyType
