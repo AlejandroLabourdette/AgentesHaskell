@@ -1,0 +1,66 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.34.4.
+--
+-- see: https://github.com/sol/hpack
+
+name:           agents-sim-haskell
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/agents-sim-haskell#readme>
+homepage:       https://github.com/AlejandroLabourdette/agents-sim-haskell#readme
+bug-reports:    https://github.com/AlejandroLabourdette/agents-sim-haskell/issues
+author:         Alejandro Labourdette
+maintainer:     jal.labourdette@gmail.com
+copyright:      2022 Alejandro Labourdette
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/AlejandroLabourdette/agents-sim-haskell
+
+library
+  exposed-modules:
+      Board
+      Elements
+      Generate
+      ListUtils
+      Operations
+      Print
+      Random
+  other-modules:
+      Paths_agents_sim_haskell
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+  default-language: Haskell2010
+
+executable agents-sim-haskell-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_agents_sim_haskell
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      agents-sim-haskell
+    , base >=4.7 && <5
+  default-language: Haskell2010
+
+test-suite agents-sim-haskell-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_agents_sim_haskell
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      agents-sim-haskell
+    , base >=4.7 && <5
+  default-language: Haskell2010
