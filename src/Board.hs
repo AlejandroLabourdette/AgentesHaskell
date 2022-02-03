@@ -125,3 +125,21 @@ remove board element
         oldCribs = cribs board
         oldObjectives = objectives board
         oldSeed = seed board
+
+purgeField :: Board -> [Char] -> Board
+purgeField board field
+    | field == objectivesField = 
+        Board oldLength oldWidth oldKids oldRobots oldObstacles oldDirts oldCribs [] oldSeed
+    | otherwise = error "Element not binded to any type"
+    where
+        oldLength = lengthBoard board
+        oldWidth = widthBoard board
+        oldKids = kids board
+        oldRobots = robots board
+        oldObstacles = obstacles board
+        oldDirts = dirts board
+        oldCribs = cribs board
+        oldObjectives = objectives board
+        oldSeed = seed board
+
+objectivesField = "Objectives"
