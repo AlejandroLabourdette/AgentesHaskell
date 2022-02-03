@@ -1,6 +1,7 @@
 module Operations where
 
 import ListUtils
+import PositionUtils
 import Board
 import Elements
 
@@ -72,8 +73,8 @@ _moveKid board kid directionX directionY
     | otherwise = 
         _moveKidForce board kid directionX directionY
     where
-        posX = _calcPosX board kid directionX 
-        posY = _calcPosY board kid directionY
+        posX = calcPosX board kid directionX 
+        posY = calcPosY board kid directionY
         obstacle = Obstacle posX posY
         loadedRobot = Robot (x kid) (y kid) True
 
@@ -86,8 +87,8 @@ _moveKidForce board kid directionX directionY
             Board.add newBoard newKid
     | otherwise = board
     where 
-        posX = _calcPosX board kid directionX
-        posY = _calcPosY board kid directionY
+        posX = calcPosX board kid directionX
+        posY = calcPosY board kid directionY
         elementType = get board posX posY
         newKid = Kid posX posY
 
@@ -101,8 +102,8 @@ _moveObstacle board obstacle directionX directionY
             _moveObstacleForce newBoard obstacle directionX directionY
     | otherwise = _moveObstacleForce board obstacle directionX directionY
     where
-        posX = _calcPosX board obstacle directionX 
-        posY = _calcPosY board obstacle directionY
+        posX = calcPosX board obstacle directionX 
+        posY = calcPosY board obstacle directionY
         otherObstacle = Obstacle posX posY
 
 _moveObstacleForce :: Board -> Obstacle  -> Int -> Int -> Board 
@@ -114,8 +115,8 @@ _moveObstacleForce board obstacle directionX directionY
             Board.add newBoard newObstacle
     | otherwise = board
     where
-        posX = _calcPosX board obstacle directionX 
-        posY = _calcPosY board obstacle directionY
+        posX = calcPosX board obstacle directionX 
+        posY = calcPosY board obstacle directionY
         elementType = get board posX posY
         newObstacle = Obstacle posX posY
 
@@ -145,19 +146,7 @@ _moveRobot board robot directionX directionY
                 Board.add newBoard (Robot posX posY (loaded robot))
     | otherwise = board
     where
-        posX = _calcPosX board robot directionX 
-        posY = _calcPosY board robot directionY
+        posX = calcPosX board robot directionX 
+        posY = calcPosY board robot directionY
         nextPosType = get board posX posY
 
-_calcPosX :: Displayable a => Board -> a -> Int -> Int
-_calcPosX board element inc
-    | posX < 1 || posX > lengthBoard board = x element
-    | otherwise = posX
-    where
-        posX = x element + inc
-_calcPosY :: Displayable a => Board -> a -> Int -> Int
-_calcPosY board element inc
-    | posY < 1 || posY > widthBoard board = y element
-    | otherwise = posY
-    where
-        posY = y element + inc

@@ -5,6 +5,7 @@ import Random
 import Board
 import Elements
 import ListUtils
+import PositionUtils
 import Operations
 
 
@@ -122,10 +123,10 @@ _getAdyEmptySlotsR board ((x,y):r) selected =
         _getAdyEmptySlotsR board r newSelected
     where
         slot = Ghost x y
-        p1 = (_calcPosX board slot 1, _calcPosY board slot 0)
-        p2 = (_calcPosX board slot (-1), _calcPosY board slot 0)
-        p3 = (_calcPosX board slot 0, _calcPosY board slot 1)
-        p4 = (_calcPosX board slot 0, _calcPosY board slot (-1))
+        p1 = (calcPosX board slot 1, calcPosY board slot 0)
+        p2 = (calcPosX board slot (-1), calcPosY board slot 0)
+        p3 = (calcPosX board slot 0, calcPosY board slot 1)
+        p4 = (calcPosX board slot 0, calcPosY board slot (-1))
         emptys = _filterEmpty board [p1,p2,p3,p4] []
         ady = ListUtils.remove (x,y) emptys -- In case i'm in
 
