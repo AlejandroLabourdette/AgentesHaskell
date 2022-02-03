@@ -96,6 +96,20 @@ addObjectiveToBoard board robot slot objtype currentCost
         oldCribs = cribs board
         oldSeed = seed board
 
+removeObjectiveFromBoard :: Board -> Objective -> Board
+removeObjectiveFromBoard board obj =
+    Board oldLength oldWidth oldKids oldRobots oldObstacles oldDirts oldCribs newObjectives oldSeed 
+    where
+        newObjectives = ListUtils.remove obj (objectives board)
+        oldLength = lengthBoard board
+        oldWidth =  widthBoard board
+        oldKids = kids board
+        oldRobots = robots board
+        oldObstacles = obstacles board
+        oldDirts = dirts board
+        oldCribs = cribs board
+        oldSeed = seed board
+
 findObjectiveWithPosGhost :: [Objective] -> Ghost -> Objective 
 findObjectiveWithPosGhost [] _ = Objective (Robot 0 0 False) 0 0 falseObj (Ghost 0 0) infinite
 findObjectiveWithPosGhost (obj:rest) pos
@@ -105,6 +119,7 @@ findObjectiveWithPosGhost (obj:rest) pos
 boardBFS :: Board -> Robot -> Ghost -> [Ghost] -> [(Ghost,Int)] -> Int -> ([Ghost],[(Ghost,Int)])
 boardBFS board robot slot visited queue cost
     | loaded robot = registerSlots board robot toRegisterLong visited queue cost
+    -- check 2 slots jump
     | otherwise = registerSlots board robot toregisterShort visited queue cost
     where
         upSlot = calcPos board slot (-1) 0

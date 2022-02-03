@@ -132,7 +132,7 @@ _moveObstacleForce board obstacle directionX directionY
 _moveRobot :: Board -> Robot -> Int -> Int -> Board 
 _moveRobot board robot directionX directionY
     | nextPosType == kidType =
-        if loaded robot
+        if loaded robot || ListUtils.exist (Robot posX posY True) (robots board)
         then board
         else 
             let 
@@ -159,3 +159,76 @@ _moveRobot board robot directionX directionY
         posY = calcPosY board robot directionY
         nextPosType = get board posX posY
 
+
+canMovRobot :: Board -> Robot -> [Char] -> Bool
+canMovRobot board robot movDirType
+    | movDirType == upDirType ||
+        movDirType == dwnDirType ||
+        movDirType == lftDirType ||
+        movDirType == rghtDirType =
+            _canSimpleMoveRobot board robot movDirType
+    | otherwise =
+        _canDoubleMoveRobot board robot movDirType
+
+_canSimpleMoveRobot :: Board -> Robot -> [Char] -> Bool 
+_canSimpleMoveRobot board robot movDirType 
+    | movDirType == upDirType =
+        let newBoard = moveUp board robot
+        in not(ListUtils.exist robot (robots newBoard))
+    | movDirType == dwnDirType =
+        let newBoard = moveDwn board robot
+        in not(ListUtils.exist robot (robots newBoard))
+    | movDirType == rghtDirType =
+        let newBoard = moveRght board robot
+        in not(ListUtils.exist robot (robots newBoard))
+    | movDirType == lftDirType =
+        let newBoard = moveLft board robot
+        in not(ListUtils.exist robot (robots newBoard))
+    | otherwise = error "Not movDirType recognize in canSimpleMove"
+
+_canDoubleMoveRobot :: Board -> Robot -> [Char] -> Bool 
+_canDoubleMoveRobot board robot movDirType 
+    | movDirType == up2DirType =
+        let 
+            can1Move = _canSimpleMoveRobot board robot upDirType
+            newBoard = moveUp board robot
+            newPos = calcPos newBoard robot (-1) 0
+            newRobot = _findRobotAt (robots newBoard) newPos
+            can2Move = _canSimpleMoveRobot newBoard newRobot upDirType
+        in
+            can1Move && can2Move
+    | movDirType == dwn2DirType =
+        let 
+            can1Move = _canSimpleMoveRobot board robot dwnDirType
+            newBoard = moveDwn board robot
+            newPos = calcPos newBoard robot 1 0
+            newRobot = _findRobotAt (robots newBoard) newPos
+            can2Move = _canSimpleMoveRobot newBoard newRobot dwnDirType
+        in
+            can1Move && can2Move
+    | movDirType == rght2DirType =
+        let 
+            can1Move = _canSimpleMoveRobot board robot rghtDirType
+            newBoard = moveRght board robot
+            newPos = calcPos newBoard robot 0 1
+            newRobot = _findRobotAt (robots newBoard) newPos
+            can2Move = _canSimpleMoveRobot newBoard newRobot rghtDirType
+        in
+            can1Move && can2Move
+    | movDirType == lft2DirType =
+        let 
+            can1Move = _canSimpleMoveRobot board robot lftDirType
+            newBoard = moveLft board robot
+            newPos = calcPos newBoard robot 0 (-1)
+            newRobot = _findRobotAt (robots newBoard) newPos
+            can2Move = _canSimpleMoveRobot newBoard newRobot lftDirType
+        in
+            can1Move && can2Move
+    | otherwise = error "Not movDirType recognize in canDoubleMove"
+
+_findRobotAt :: Displayable a => [Robot] -> a -> Robot
+_findRobotAt [] pos = error "Robot not founded"
+_findRobotAt (robot:rest) pos
+    | x robot == x pos && y robot == y pos = 
+        robot
+    | otherwise = _findRobotAt rest pos
