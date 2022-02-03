@@ -3,7 +3,7 @@ import Board
 
 -- change the seed after use it
 changeSeed :: Board -> Board
-changeSeed b = Board (lengthBoard b) (widthBoard b) (kids b) (robots b) (obstacles b) (dirts b) (cribs b) newSeed
+changeSeed b = Board (lengthBoard b) (widthBoard b) (kids b) (robots b) (obstacles b) (dirts b) (cribs b) (objectives b) newSeed
     where
         oldSeed = seed b
         newSeed = _generateForSeed oldSeed

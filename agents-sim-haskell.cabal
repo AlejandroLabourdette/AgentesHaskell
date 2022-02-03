@@ -29,6 +29,7 @@ library
       Elements
       Generate
       ListUtils
+      Objectives
       Operations
       PositionUtils
       Print

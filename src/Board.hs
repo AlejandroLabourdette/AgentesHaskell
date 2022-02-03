@@ -12,11 +12,20 @@ data Board = Board {
     obstacles :: [Obstacle],
     dirts :: [Dirt],
     cribs :: [Crib],
+    objectives :: [Objective],
     seed :: Int
 } deriving (Show)
 
+data Objective = Objective {
+    robot :: Robot,
+    destinyX :: Int,
+    destinyY :: Int,
+    action :: String,
+    cost :: Int
+} deriving (Show, Eq)
+
 initializeBoard :: Int -> Int -> Int -> Board
-initializeBoard n m = Board n m [] [] [] [] []
+initializeBoard n m = Board n m [] [] [] [] [] []
 
 
 get :: Board -> Int -> Int -> [Char]
@@ -37,27 +46,27 @@ add board element
         let 
             newKids = ListUtils.add (toKid element) (kids board)
         in
-            Board oldLength oldWidth newKids oldRobots oldObstacles oldDirts oldCribs oldSeed
+            Board oldLength oldWidth newKids oldRobots oldObstacles oldDirts oldCribs oldObjectives oldSeed
     | kind element == robotType = 
         let
             newRobots = ListUtils.add (toRobot element) (robots board)
         in
-            Board oldLength oldWidth oldKids newRobots oldObstacles oldDirts oldCribs oldSeed
+            Board oldLength oldWidth oldKids newRobots oldObstacles oldDirts oldCribs oldObjectives oldSeed
     | kind element == obstacleType =
         let
             newObstacles = ListUtils.add (toObstacle element) (obstacles board)
         in
-            Board oldLength oldWidth oldKids oldRobots newObstacles oldDirts oldCribs oldSeed
+            Board oldLength oldWidth oldKids oldRobots newObstacles oldDirts oldCribs oldObjectives oldSeed
     | kind element == dirtType  =
         let
             newDirts = ListUtils.add (toDirt element) (dirts board)
         in
-            Board oldLength oldWidth oldKids oldRobots oldObstacles newDirts oldCribs oldSeed
+            Board oldLength oldWidth oldKids oldRobots oldObstacles newDirts oldCribs oldObjectives oldSeed
     | kind element == cribType  =
         let
             newCribs = ListUtils.add (toCrib element) (cribs board)
         in
-            Board oldLength oldWidth oldKids oldRobots oldObstacles oldDirts newCribs oldSeed
+            Board oldLength oldWidth oldKids oldRobots oldObstacles oldDirts newCribs oldObjectives oldSeed
     | otherwise = error "Element not binded to any type"
     where
         oldLength = lengthBoard board
@@ -67,6 +76,7 @@ add board element
         oldObstacles = obstacles board
         oldDirts = dirts board
         oldCribs = cribs board
+        oldObjectives = objectives board
         oldSeed = seed board
 
 
@@ -76,27 +86,27 @@ remove board element
         let 
             newKids = ListUtils.remove (toKid element) (kids board)
         in
-            Board oldLength oldWidth newKids oldRobots oldObstacles oldDirts oldCribs oldSeed
+            Board oldLength oldWidth newKids oldRobots oldObstacles oldDirts oldCribs oldObjectives oldSeed
     | kind element == robotType = 
         let
             newRobots = ListUtils.remove (toRobot element) (robots board)
         in
-            Board oldLength oldWidth oldKids newRobots oldObstacles oldDirts oldCribs oldSeed
+            Board oldLength oldWidth oldKids newRobots oldObstacles oldDirts oldCribs oldObjectives oldSeed
     | kind element == obstacleType =
         let
             newObstacles = ListUtils.remove (toObstacle element) (obstacles board)
         in
-            Board oldLength oldWidth oldKids oldRobots newObstacles oldDirts oldCribs oldSeed
+            Board oldLength oldWidth oldKids oldRobots newObstacles oldDirts oldCribs oldObjectives oldSeed
     | kind element == dirtType  =
         let
             newDirts = ListUtils.remove (toDirt element) (dirts board)
         in
-            Board oldLength oldWidth oldKids oldRobots oldObstacles newDirts oldCribs oldSeed
+            Board oldLength oldWidth oldKids oldRobots oldObstacles newDirts oldCribs oldObjectives oldSeed
     | kind element == cribType  =
         let
             newCribs = ListUtils.remove (toCrib element) (cribs board)
         in
-            Board oldLength oldWidth oldKids oldRobots oldObstacles oldDirts newCribs oldSeed
+            Board oldLength oldWidth oldKids oldRobots oldObstacles oldDirts newCribs oldObjectives oldSeed
     | otherwise = error "Element not binded to any type"
     where
         oldLength = lengthBoard board
@@ -106,4 +116,5 @@ remove board element
         oldObstacles = obstacles board
         oldDirts = dirts board
         oldCribs = cribs board
+        oldObjectives = objectives board
         oldSeed = seed board
