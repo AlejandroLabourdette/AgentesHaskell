@@ -168,9 +168,12 @@ canMovRobot board robot movDirType
         movDirType == dwnDirType ||
         movDirType == lftDirType ||
         movDirType == rghtDirType =
-            _canSimpleMoveRobot board robot movDirType
+            _canSimpleMoveRobot newBoard2 robot movDirType
     | otherwise =
-        _canDoubleMoveRobot board robot movDirType
+        _canDoubleMoveRobot newBoard2 robot movDirType
+    where
+        newBoard1 = Board.remove board robot
+        newBoard2 = Board.add newBoard1 robot
 
 _canSimpleMoveRobot :: Board -> Robot -> [Char] -> Bool 
 _canSimpleMoveRobot board robot movDirType 

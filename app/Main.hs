@@ -45,10 +45,10 @@ board05 = generateDirts board04 3
 -- board12 = Operations.dropKid board11 (Robot 2 5 True)
 
 programCycle :: Board -> Int -> String
-programCycle board 0 = printBoard board ++ "FINITO"
+programCycle board 0 = printBoard board ++ "\n" ++ show(objectives board) ++ "\n" ++ "FINITO"
 programCycle board iter = 
     let
         newBoard = doAgentsTurn board
     in
-        printBoard board ++ "\n" ++ programCycle newBoard (iter-1)
+        show(objectives board) ++ "\n" ++ printBoard board ++ "\n" ++  programCycle newBoard (iter-1)
     

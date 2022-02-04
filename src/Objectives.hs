@@ -199,7 +199,8 @@ _computeFirstStep board robot visited (queueElement:queueRest)
     | closeToObjective board robot slot = slot
     | otherwise =
         let
-            (newVisited,newQueue) = boardInverseBFS board robot slot visited queueRest cost
+            (newVisited,newQueue) = boardBFS board robot slot visited queueRest cost
+            --  board robot slot visited queueRest cost
         in 
             _computeFirstStep board robot newVisited newQueue
     where
@@ -222,35 +223,3 @@ closeToObjective board robot slot
         rght2Slot = calcPos board slot 0 2
         shortList = [upSlot,dwnSlot,lftSlot,rghtSlot]
         longList = [upSlot,up2Slot,dwnSlot,dwn2Slot,lftSlot,lft2Slot,rghtSlot,rght2Slot]
-
-boardInverseBFS :: Board -> Robot -> Ghost -> [Ghost] -> [(Ghost,Int)] -> Int -> ([Ghost],[(Ghost,Int)])
-boardInverseBFS board robot slot visited queue cost
-    | loaded robot = registerSlotsInverse board toRegisterLong visited queue cost
-    | otherwise = registerSlotsInverse board toregisterShort visited queue cost
-    where
-        upSlot = calcPos board slot (-1) 0
-        up2Slot = calcPos board slot (-2) 0
-        dwnSlot = calcPos board slot 1 0
-        dwn2Slot = calcPos board slot 2 0
-        lftSlot = calcPos board slot 0 (-1)
-        lft2Slot = calcPos board slot 0 (-2)
-        rghtSlot = calcPos board slot 0 1
-        rght2Slot = calcPos board slot 0 2
-        toregisterShort = [upSlot,dwnSlot,lftSlot,rghtSlot]
-        toRegisterLong = [upSlot,up2Slot,dwnSlot,dwn2Slot,lftSlot,lft2Slot,rghtSlot,rght2Slot]
-
-registerSlotsInverse :: Board -> [Ghost] -> [Ghost] -> [(Ghost,Int)] -> Int -> ([Ghost],[(Ghost,Int)])
-registerSlotsInverse board [] visited queue cost = (visited,queue)
-registerSlotsInverse board (toReg:rest) visited queue cost
-    | not (ListUtils.exist toReg visited) && slotTypeIsCorrect =
-        let
-            newVisited = ListUtils.add toReg visited
-            newQueue = ListUtils.add (toReg,cost+1) queue
-        in
-            registerSlotsInverse board rest newVisited newQueue cost
-    | otherwise = 
-        registerSlotsInverse board rest visited queue cost
-    where
-        slotType = get board (x toReg) (y toReg)
-        slotTypeIsCorrect = 
-            slotType == emptyType
