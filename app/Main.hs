@@ -28,8 +28,8 @@ main = do
     putStrLn (programCycle board06 30)
 
 -- board01 = initializeBoard 6 6 876318
-board01 = initializeBoard 6 6 214
--- board01 = initializeBoard 6 6 134701375
+-- board01 = initializeBoard 6 6 214
+board01 = initializeBoard 6 6 2134
 board02 = generateCribs board01 3
 board03 = generateObstcles board02 3
 board04 = generateKids board03 3

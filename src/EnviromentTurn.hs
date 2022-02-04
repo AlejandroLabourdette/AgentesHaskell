@@ -105,7 +105,18 @@ gridWithCenter board center=
 
 
 moveKidsRandom :: Board -> [Kid] -> Board 
-moveKidsRandom = foldl moveKidRandom
+moveKidsRandom board [] = board
+moveKidsRandom board (kid:rest)
+    | gen == 1 =
+        let
+            movedKidBoard = moveKidRandom changeSeedBoard kid
+        in
+            moveKidsRandom movedKidBoard rest
+    | otherwise =
+        moveKidsRandom changeSeedBoard rest
+    where
+        gen = generateRandom 2 (seed board)
+        changeSeedBoard = changeSeed board
 
 moveKidRandom :: Board -> Kid -> Board 
 moveKidRandom board kid
