@@ -8,6 +8,7 @@ import Operations
 import Generate
 import Objectives
 import AgentsTurn
+import EnviromentTurn
 
 main :: IO ()
 main = do
@@ -24,14 +25,14 @@ main = do
     -- putStrLn (printBoard board11)
     -- putStrLn (printBoard board12)
     -- print (computeObjectives board05)
-    putStrLn (programCycle board05 15)
+    putStrLn (programCycle board03 15)
 
 -- board01 = initializeBoard 6 6 876318
-board01 = initializeBoard 6 6 876314
+board01 = initializeBoard 6 6 214
 board02 = generateCribs board01 2
 board03 = generateKids board02 3
-board04 = generateRobots board03 3 
-board05 = generateDirts board04 3 
+board04 = generateRobots board03 3
+board05 = generateDirts board04 3
 -- board06 = doAgentsTurn board05 
 -- board07 = doAgentsTurn board06  
 -- board08 = doAgentsTurn board07
@@ -44,11 +45,14 @@ board05 = generateDirts board04 3
 -- board11 = Operations.moveDwn board10 (Robot 1 5 True)
 -- board12 = Operations.dropKid board11 (Robot 2 5 True)
 
+randomMoveKids:: Board -> [Kid] -> Board
+randomMoveKids = foldl moveKidRandom
+
 programCycle :: Board -> Int -> String
-programCycle board 0 = printBoard board ++ "\n" ++ show(objectives board) ++ "\n" ++ "FINITO"
-programCycle board iter = 
+programCycle board 0 = printBoard board ++ "\n" ++ "FINITO"
+programCycle board iter =
     let
-        newBoard = doAgentsTurn board
+        newBoard = randomMoveKids board (kids board)
     in
-        show(objectives board) ++ "\n" ++ printBoard board ++ "\n" ++  programCycle newBoard (iter-1)
+        printBoard board ++ "\n" ++  programCycle newBoard (iter-1)
     

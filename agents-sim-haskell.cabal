@@ -28,6 +28,7 @@ library
       AgentsTurn
       Board
       Elements
+      EnviromentTurn
       Generate
       ListUtils
       Objectives
