@@ -1,11 +1,11 @@
-module Print (printBoard) where
+module Print (boardToString) where
 
 import Board
 import Elements
 import ListUtils
 
-printBoard :: Board -> String
-printBoard board = _printBoard n m board 
+boardToString :: Board -> [Char]
+boardToString board = _printBoard n m board 
     where
         n = lengthBoard board
         m = widthBoard board
