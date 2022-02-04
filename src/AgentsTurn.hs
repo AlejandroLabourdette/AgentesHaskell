@@ -23,7 +23,13 @@ _doAgentTurn :: Board -> Robot -> Board
 _doAgentTurn board robot
     | action newobjective == moveObj =
         executeMovObj newBoard2 newobjective
-    | otherwise = error"Faltan Por implementar"
+    | action newobjective == cleanObj =
+        executeCleanObj newBoard2 newobjective
+    | action newobjective == dropObj =
+        executeDropObj newBoard2 newobjective
+    | action newobjective == noObj =
+        newBoard2
+    | otherwise = error("Faltan Por implementar " ++ action newobjective)
     where
         objective = getRobotObjective (objectives board) robot
         newBoard1 = removeObjectiveFromBoard board objective
@@ -58,5 +64,15 @@ executeMovObj board objective
     | otherwise = error "Direction Type pattern not matched"
     where
         robot = robotObj objective
-        destiny = Ghost (destinyX objective) (destinyY objective)
+        destiny = Ghost (x (nextSlot objective)) (y (nextSlot objective))
         directionType = getDirectionType robot destiny
+
+executeCleanObj :: Board -> Objective -> Board
+executeCleanObj board obj = clean board robot
+    where
+        robot = robotObj obj
+
+executeDropObj :: Board -> Objective -> Board
+executeDropObj board obj = dropKid board robot
+    where
+        robot = robotObj obj

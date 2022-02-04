@@ -22,31 +22,29 @@ _printBoard n m board = start ++ _printElement board x y ++ "|" ++ _printBoard n
         start = if y == 1 then "|" else "" 
 
 _printElement :: Board -> Int -> Int -> String 
-_printElement board x y
-    | elementType == kidType = _printKid board x y
-    | elementType == robotType = _printRobot board x y
-    | elementType == obstacleType = _printObstacle board x y
-    | elementType == dirtType = _printDirt board x y
-    | elementType == cribType = _printCrib board x y
-    | otherwise = _printSpace
-    where
-        elementType = get board x y
+_printElement board x y =
+    _printKid board x y ++ _printRobot board x y ++ _printObstacle board x y ++_printDirt board x y++_printCrib board x y
+    
 
 _printKid :: Board -> Int -> Int -> String 
 _printKid board x y 
-    | exist (Robot x y True) (robots board) = "L " -- falta cuando el bot suelta al ninho en la cuna
-    | exist (Robot x y False) (robots board) = "RK"
-    | otherwise = "K "
+    | exist (Kid x y) (kids board) = "k" -- falta cuando el bot suelta al ninho en la cuna
+    | otherwise = " "
 _printRobot :: Board -> Int -> Int -> String 
 _printRobot board x y
-    | exist (Dirt x y) (dirts board) = "RD"
-    | exist (Crib x y False) (cribs board) = "RC"
-    | otherwise = "R "
+    | exist (Robot x y True) (robots board) = "R"
+    | exist (Robot x y False) (robots board) = "r"
+    | otherwise = " "
 _printObstacle :: Board -> Int -> Int -> String 
-_printObstacle _ _ _ = "# "
+_printObstacle board x y
+    | exist (Obstacle x y) (obstacles board) = "o"
+    | otherwise = " "
 _printDirt :: Board -> Int -> Int -> String 
-_printDirt _ _ _ = "- "
+_printDirt board x y
+    | exist (Dirt x y) (dirts board) = "d"
+    | otherwise = " "
 _printCrib :: Board -> Int -> Int -> String 
-_printCrib _ _ _ = "U "
-_printSpace :: [Char]
-_printSpace = "  "
+_printCrib board x y
+    | exist (Crib x y True) (cribs board) = "C"
+    | exist (Crib x y False) (cribs board) = "c"
+    | otherwise = " "
