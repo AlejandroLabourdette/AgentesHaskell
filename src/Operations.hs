@@ -66,9 +66,12 @@ _moveDouble :: Displayable a => Board -> a -> Int -> Int -> Board
 _moveDouble board element directionX directionY
     | (kind element == robotType) && loaded element = 
         let 
-            newBoard = _move board element directionX directionY
+            robot = toRobot element
+            newBoard = _move board robot directionX directionY
+            newPos = calcPos newBoard robot directionX directionY
+            newRobot = Robot (x newPos) (y newPos) (loaded robot) 
         in 
-            _move newBoard element directionX directionY
+            _move newBoard newRobot directionX directionY
     | otherwise = error "Only can do double movement robots that have a child loaded"
 
 _moveKid :: Board -> Kid -> Int -> Int -> Board 
