@@ -132,7 +132,9 @@ _moveObstacleForce board obstacle directionX directionY
 _moveRobot :: Board -> Robot -> Int -> Int -> Board 
 _moveRobot board robot directionX directionY
     | nextPosType == kidType =
-        if loaded robot || ListUtils.exist (Robot posX posY True) (robots board)
+        if loaded robot || 
+            ListUtils.exist (Robot posX posY True) (robots board) ||
+            ListUtils.exist (Crib posX posY True) (cribs board)
         then board
         else 
             let 

@@ -5,6 +5,7 @@ import Board
 import Elements
 import ListUtils
 import PositionUtils
+import Operations
 
 
 computeObjectives :: Board -> Board
@@ -118,43 +119,76 @@ findObjectiveWithPosGhost (obj:rest) pos
 
 boardBFS :: Board -> Robot -> Ghost -> [Ghost] -> [(Ghost,Int)] -> Int -> ([Ghost],[(Ghost,Int)])
 boardBFS board robot slot visited queue cost
-    | loaded robot = registerSlots board robot toRegisterLong visited queue cost
-    -- check 2 slots jump
-    | otherwise = registerSlots board robot toregisterShort visited queue cost
+    | loaded robot = 
+        let
+            (visited1, queue1) = registerSlots1Mov board robot slot visited queue cost
+            (visited2, queue2) = registerSlots2Mov board robot slot visited queue cost
+            visited3 = ListUtils.join visited1 visited2
+            queue3 = ListUtils.join  queue1 queue2
+        in
+            (visited3,queue3)
+    | otherwise = registerSlots1Mov board robot slot visited queue cost
+    
+
+registerSlots1Mov :: Board -> Robot -> Ghost -> [Ghost] -> [(Ghost,Int)] -> Int -> ([Ghost],[(Ghost,Int)])
+registerSlots1Mov board robot slot visited queue cost =
+    let
+        imagRobot = Robot (x slot) (y slot) (loaded robot)
+        (visited1, queue1) =
+            if not (ListUtils.exist upSlot visited) && canMovRobot board imagRobot upDirType 
+            then (ListUtils.add upSlot visited, ListUtils.add (upSlot,cost+1) queue)
+            else (visited,queue)
+        (visited2, queue2) =
+            if not (ListUtils.exist dwnSlot visited) && canMovRobot board imagRobot dwnDirType 
+            then (ListUtils.add dwnSlot visited1, ListUtils.add (dwnSlot,cost+1) queue1)
+            else (visited1,queue1)
+        (visited3, queue3) =
+            if not (ListUtils.exist lftSlot visited) && canMovRobot board imagRobot lftDirType 
+            then (ListUtils.add lftSlot visited2, ListUtils.add (lftSlot,cost+1) queue2)
+            else (visited2,queue2)
+        (visited4, queue4) =
+            if not (ListUtils.exist rghtSlot visited) && canMovRobot board imagRobot rghtDirType 
+            then (ListUtils.add rghtSlot visited3, ListUtils.add (rghtSlot,cost+1) queue3)
+            else (visited3,queue3)
+    in
+        (visited4,queue4)
     where
         upSlot = calcPos board slot (-1) 0
-        up2Slot = calcPos board slot (-2) 0
         dwnSlot = calcPos board slot 1 0
-        dwn2Slot = calcPos board slot 2 0
         lftSlot = calcPos board slot 0 (-1)
-        lft2Slot = calcPos board slot 0 (-2)
         rghtSlot = calcPos board slot 0 1
-        rght2Slot = calcPos board slot 0 2
-        toregisterShort = [upSlot,dwnSlot,lftSlot,rghtSlot]
-        toRegisterLong = [upSlot,up2Slot,dwnSlot,dwn2Slot,lftSlot,lft2Slot,rghtSlot,rght2Slot]
 
-registerSlots :: Board -> Robot -> [Ghost] -> [Ghost] -> [(Ghost,Int)] -> Int -> ([Ghost],[(Ghost,Int)])
-registerSlots board robot [] visited queue cost = (visited,queue)
-registerSlots board robot (toReg:rest) visited queue cost
-    | not (ListUtils.exist toReg visited) && slotTypeIsCorrect =
-        let
-            newVisited = ListUtils.add toReg visited
-            newQueue = ListUtils.add (toReg,cost+1) queue
-        in
-            registerSlots board robot rest newVisited newQueue cost
-    | otherwise = 
-        registerSlots board robot rest visited queue cost
+registerSlots2Mov :: Board -> Robot -> Ghost -> [Ghost] -> [(Ghost,Int)] -> Int -> ([Ghost],[(Ghost,Int)])
+registerSlots2Mov board robot slot visited queue cost =
+    let
+        imagRobot = Robot (x slot) (y slot) (loaded robot)
+        (visited1, queue1) =
+            if not (ListUtils.exist up2Slot visited) 
+                && canMovRobot board imagRobot up2DirType 
+            then (ListUtils.add up2Slot visited, ListUtils.add (up2Slot,cost+1) queue)
+            else (visited,queue)
+        (visited2, queue2) =
+            if not (ListUtils.exist dwn2Slot visited)
+                && canMovRobot board imagRobot dwn2DirType 
+            then (ListUtils.add dwn2Slot visited1, ListUtils.add (dwn2Slot,cost+1) queue1)
+            else (visited1,queue1)
+        (visited3, queue3) =
+            if not (ListUtils.exist lft2Slot visited)
+                && canMovRobot board imagRobot lft2DirType 
+            then (ListUtils.add lft2Slot visited2, ListUtils.add (lft2Slot,cost+1) queue2)
+            else (visited2,queue2)
+        (visited4, queue4) =
+            if not (ListUtils.exist rght2Slot visited)
+                && canMovRobot board imagRobot rght2DirType 
+            then (ListUtils.add rght2Slot visited3, ListUtils.add (rght2Slot,cost+1) queue3)
+            else (visited3,queue3)
+    in
+        (visited4,queue4)
     where
-        slotType = get board (x toReg) (y toReg)
-        possibleRobot = Robot (x toReg) (y toReg) True
-        possibleCrib = Crib (x toReg) (y toReg) True
-        noRobot = not(ListUtils.exist possibleRobot (robots board))
-        noCrib = not(ListUtils.exist possibleCrib (cribs board))
-        slotTypeIsCorrect =
-            (slotType == kidType && not(loaded robot) && noRobot && noCrib) || -- are kids fine here?
-            slotType == dirtType || 
-            slotType == cribType || 
-            slotType == emptyType
+        up2Slot = calcPos board slot (-2) 0
+        dwn2Slot = calcPos board slot 2 0
+        lft2Slot = calcPos board slot 0 (-2)
+        rght2Slot = calcPos board slot 0 2
 
 computeFirstStep :: Board -> Ghost -> Robot -> Ghost 
 computeFirstStep board endPos robot = _computeFirstStep board robot [endPos] [(endPos,0)]
