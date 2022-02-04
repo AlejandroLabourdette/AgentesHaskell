@@ -13,7 +13,23 @@ doEnviromentTurn board = error""
 
 
 executeKidsTurn :: Board -> Board 
-executeKidsTurn board = _executeKidsTurn board (kids board)
+executeKidsTurn board = 
+    _executeKidsTurn board notLoadedKids
+    where
+        notLoadedKids = getKidsNotLoaded board (kids board)
+
+getKidsNotLoaded :: Board -> [Kid] -> [Kid]
+getKidsNotLoaded board [] = []
+getKidsNotLoaded board (kid:rest)
+    | existRobot || existCrib = 
+        getKidsNotLoaded board rest
+    | otherwise =
+        ListUtils.add kid (getKidsNotLoaded board rest)
+    where
+        possibleRobot = Robot (x kid) (y kid) True 
+        possibleCrib = Crib (x kid) (y kid) True 
+        existRobot = ListUtils.exist possibleRobot (robots board)
+        existCrib = ListUtils.exist possibleCrib (cribs board)
 
 _executeKidsTurn :: Board -> [Kid] -> Board 
 _executeKidsTurn board [] = board

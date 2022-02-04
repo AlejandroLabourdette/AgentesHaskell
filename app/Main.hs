@@ -25,16 +25,16 @@ main = do
     -- putStrLn (printBoard board11)
     -- putStrLn (printBoard board12)
     -- print (computeObjectives board05)
-    putStrLn (programCycle board04 15)
+    putStrLn (programCycle board06 30)
 
-board01 = initializeBoard 6 6 876318
--- board01 = initializeBoard 6 6 214
+-- board01 = initializeBoard 6 6 876318
+board01 = initializeBoard 6 6 214
 -- board01 = initializeBoard 6 6 134701375
-board02 = generateCribs board01 0
-board03 = generateObstcles board02 7
+board02 = generateCribs board01 3
+board03 = generateObstcles board02 3
 board04 = generateKids board03 3
--- board05 = generateRobots board04 3
--- board06 = generateDirts board05 3
+board05 = generateRobots board04 3
+board06 = generateDirts board05 3
 -- board07 = doAgentsTurn board06  
 -- board08 = doAgentsTurn board07
 -- board09 = doAgentsTurn board08
@@ -51,7 +51,11 @@ programCycle :: Board -> Int -> String
 programCycle board 0 = printBoard board ++ "\n" ++ "FINITO"
 programCycle board iter =
     let
-        newBoard = executeKidsTurn board 
+        newBoard = doAgentsTurn board 
+        newBoard2 =
+            if  mod iter 5 == 0 
+            then executeKidsTurn newBoard
+            else newBoard
     in
-        printBoard board ++ "\n" ++  programCycle newBoard (iter-1)
+        printBoard board ++ "\n" ++  programCycle newBoard2 (iter-1)
     
