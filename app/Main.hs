@@ -25,15 +25,16 @@ main = do
     -- putStrLn (printBoard board11)
     -- putStrLn (printBoard board12)
     -- print (computeObjectives board05)
-    putStrLn (programCycle board03 15)
+    putStrLn (programCycle board04 15)
 
--- board01 = initializeBoard 6 6 876318
-board01 = initializeBoard 6 6 214
-board02 = generateCribs board01 2
-board03 = generateKids board02 3
-board04 = generateRobots board03 3
-board05 = generateDirts board04 3
--- board06 = doAgentsTurn board05 
+board01 = initializeBoard 6 6 876318
+-- board01 = initializeBoard 6 6 214
+-- board01 = initializeBoard 6 6 134701375
+board02 = generateCribs board01 0
+board03 = generateObstcles board02 7
+board04 = generateKids board03 3
+-- board05 = generateRobots board04 3
+-- board06 = generateDirts board05 3
 -- board07 = doAgentsTurn board06  
 -- board08 = doAgentsTurn board07
 -- board09 = doAgentsTurn board08
@@ -45,14 +46,12 @@ board05 = generateDirts board04 3
 -- board11 = Operations.moveDwn board10 (Robot 1 5 True)
 -- board12 = Operations.dropKid board11 (Robot 2 5 True)
 
-randomMoveKids:: Board -> [Kid] -> Board
-randomMoveKids = foldl moveKidRandom
 
 programCycle :: Board -> Int -> String
 programCycle board 0 = printBoard board ++ "\n" ++ "FINITO"
 programCycle board iter =
     let
-        newBoard = randomMoveKids board (kids board)
+        newBoard = executeKidsTurn board 
     in
         printBoard board ++ "\n" ++  programCycle newBoard (iter-1)
     
