@@ -54,7 +54,7 @@ programCycle board iter =
         newBoard = doAgentsTurn board 
         newBoard2 =
             if  mod iter 5 == 0 
-            then executeKidsTurn newBoard
+            then doEnviromentTurn newBoard 2
             else newBoard
     in
         printBoard board ++ "\n" ++  programCycle newBoard2 (iter-1)

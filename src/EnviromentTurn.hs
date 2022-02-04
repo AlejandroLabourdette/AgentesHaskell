@@ -6,10 +6,16 @@ import ListUtils
 import PositionUtils
 import Random
 import Operations
+import Generate
 
 
-doEnviromentTurn :: Board -> Board
-doEnviromentTurn board = error""
+doEnviromentTurn :: Board -> Int -> Board
+doEnviromentTurn board dirtToGen = 
+    let
+        newBoard = executeKidsTurn board
+        newBoard1 = generateDirts newBoard dirtToGen
+    in 
+        newBoard1
 
 
 executeKidsTurn :: Board -> Board 
